@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Visão financeira agregada da CMO, integrada ao Omie em modo somente leitura.">
+  <title>CMO Financeiro | Visão executiva</title>
+  <style>
+    :root {
+      --bg: #070d18; --bg-soft: #0d1625; --panel: rgba(16, 28, 46, .84); --panel-2: #13223a;
+      --line: rgba(161, 185, 218, .14); --text: #f3f7fc; --muted: #9baec5; --muted-2: #71849b;
+      --mint: #62e0b3; --cyan: #63c9ff; --gold: #f6bf69; --rose: #ff7e91; --violet: #a996ff;
+      --shadow: 0 28px 80px rgba(0,0,0,.26); --radius: 22px;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; min-width: 320px; color: var(--text); background: var(--bg); font: 14px/1.5 Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; }
+    body::before { content: ""; position: fixed; inset: 0; z-index: -2; background: radial-gradient(circle at 86% -8%, rgba(82,175,255,.22), transparent 32rem), radial-gradient(circle at -5% 25%, rgba(58,218,164,.1), transparent 28rem); }
+    body::after { content: ""; position: fixed; inset: 0; z-index: -1; opacity: .18; pointer-events: none; background-image: linear-gradient(rgba(255,255,255,.018) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.018) 1px, transparent 1px); background-size: 36px 36px; mask-image: linear-gradient(to bottom, black, transparent 80%); }
+    button { font: inherit; }
+    .page { width: min(1440px, 100%); margin: 0 auto; padding: 24px 32px 42px; }
+    .topbar { display: flex; align-items: center; justify-content: space-between; gap: 18px; margin-bottom: 28px; }
+    .brand { display: flex; align-items: center; gap: 12px; }
+    .brand-mark { width: 42px; height: 42px; display: grid; place-items: center; border-radius: 14px; color: #06151a; font-size: 12px; font-weight: 950; letter-spacing: -.04em; background: linear-gradient(135deg, var(--mint), var(--cyan)); box-shadow: 0 12px 28px rgba(76, 215, 173, .22); }
+    .brand strong { display: block; font-size: 15px; letter-spacing: -.01em; }
+    .brand small { display: block; color: var(--muted-2); font-size: 11px; }
+    .top-actions { display: flex; align-items: center; gap: 9px; flex-wrap: wrap; justify-content: flex-end; }
+    .pill { display: inline-flex; align-items: center; gap: 8px; padding: 8px 11px; border: 1px solid var(--line); border-radius: 999px; color: var(--muted); background: rgba(15,28,46,.7); font-size: 11px; font-weight: 700; }
+    .pill.ok { color: var(--mint); border-color: rgba(98,224,179,.25); }
+    .dot { width: 7px; height: 7px; border-radius: 50%; background: currentColor; box-shadow: 0 0 0 4px rgba(98,224,179,.1); }
+    .hero { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(360px, .8fr); gap: 22px; padding: 30px; margin-bottom: 18px; overflow: hidden; border: 1px solid rgba(99,201,255,.19); border-radius: var(--radius); background: linear-gradient(130deg, rgba(18,45,75,.93), rgba(12,27,48,.88) 58%, rgba(15,38,55,.83)); box-shadow: var(--shadow); }
+    .eyebrow { color: var(--mint); font-size: 10px; font-weight: 850; letter-spacing: .16em; text-transform: uppercase; }
+    h1, h2, h3, p { margin-top: 0; } h1 { max-width: 760px; margin: 10px 0 10px; font-size: clamp(30px, 4vw, 54px); line-height: .98; letter-spacing: -.065em; }
+    .hero-copy p { max-width: 650px; margin-bottom: 20px; color: #b7c9dc; font-size: 15px; }
+    .hero-note { display: flex; align-items: center; gap: 9px; color: var(--muted); font-size: 11px; }
+    .hero-note strong { color: var(--text); }
+    .hero-score { display: flex; flex-direction: column; justify-content: space-between; padding: 20px; border: 1px solid rgba(255,255,255,.12); border-radius: 18px; background: rgba(3,13,25,.25); }
+    .score-label { color: var(--muted); font-size: 11px; font-weight: 750; text-transform: uppercase; letter-spacing: .08em; }
+    .score-value { margin: 14px 0 4px; font-size: clamp(30px, 4vw, 48px); font-weight: 900; letter-spacing: -.06em; }
+    .score-sub { color: var(--muted); font-size: 12px; }
+    .score-footer { display: flex; justify-content: space-between; gap: 14px; padding-top: 22px; margin-top: 20px; border-top: 1px solid var(--line); }
+    .score-footer span { display: block; color: var(--muted-2); font-size: 10px; text-transform: uppercase; } .score-footer strong { display: block; margin-top: 4px; font-size: 15px; }
+    .kpi-grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 12px; margin-bottom: 18px; }
+    .kpi { position: relative; min-height: 132px; padding: 18px; overflow: hidden; border: 1px solid var(--line); border-radius: 18px; background: var(--panel); box-shadow: 0 16px 38px rgba(0,0,0,.12); }
+    .kpi::after { content: ""; position: absolute; right: -24px; bottom: -34px; width: 100px; height: 100px; border-radius: 50%; background: var(--accent, var(--cyan)); opacity: .08; filter: blur(4px); }
+    .kpi-label { color: var(--muted); font-size: 11px; font-weight: 750; } .kpi-value { margin: 18px 0 5px; color: var(--text); font-size: clamp(20px, 2vw, 27px); font-weight: 900; letter-spacing: -.05em; white-space: nowrap; }
+    .kpi-sub { color: var(--muted-2); font-size: 11px; } .kpi.mint { --accent: var(--mint); } .kpi.gold { --accent: var(--gold); } .kpi.rose { --accent: var(--rose); } .kpi.violet { --accent: var(--violet); }
+    .dashboard-grid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 16px; }
+    .panel { min-width: 0; padding: 20px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--panel); box-shadow: 0 16px 38px rgba(0,0,0,.1); }
+    .span-7 { grid-column: span 7; } .span-5 { grid-column: span 5; } .span-4 { grid-column: span 4; } .span-8 { grid-column: span 8; } .span-12 { grid-column: span 12; }
+    .panel-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 20px; } .panel-head h2 { margin: 0 0 4px; font-size: 16px; letter-spacing: -.02em; } .panel-head p { margin: 0; color: var(--muted-2); font-size: 11px; }
+    .panel-tag { padding: 5px 8px; border: 1px solid var(--line); border-radius: 8px; color: var(--muted); font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: .08em; }
+    .bars { display: grid; gap: 15px; } .bar-row { display: grid; grid-template-columns: minmax(105px, 1fr) 2fr auto; gap: 12px; align-items: center; } .bar-label { overflow: hidden; color: #cbd9e8; text-overflow: ellipsis; white-space: nowrap; font-size: 12px; } .bar-track { height: 10px; overflow: hidden; border-radius: 999px; background: rgba(155,177,204,.12); } .bar-fill { height: 100%; min-width: 2px; border-radius: inherit; background: linear-gradient(90deg, #369fcb, var(--cyan)); } .bar-fill.mint { background: linear-gradient(90deg, #258e76, var(--mint)); } .bar-fill.gold { background: linear-gradient(90deg, #b97536, var(--gold)); } .bar-fill.rose { background: linear-gradient(90deg, #ae405f, var(--rose)); } .bar-fill.violet { background: linear-gradient(90deg, #6a59cc, var(--violet)); } .bar-value { min-width: 126px; color: var(--text); text-align: right; font-size: 12px; font-weight: 800; } .bar-value small { color: var(--muted-2); font-weight: 650; }
+    .company-list { display: grid; gap: 12px; } .company-card { padding: 14px; border: 1px solid var(--line); border-radius: 14px; background: rgba(8,20,36,.3); } .company-top { display: flex; justify-content: space-between; gap: 10px; margin-bottom: 11px; } .company-name { font-weight: 800; } .company-count { color: var(--muted); font-size: 11px; } .company-metric { display: flex; justify-content: space-between; gap: 12px; color: var(--muted); font-size: 11px; } .company-metric strong { color: var(--text); }
+    .insight-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; } .insight { padding: 14px; border: 1px solid var(--line); border-radius: 14px; background: rgba(8,20,36,.3); } .insight span { color: var(--muted-2); font-size: 10px; text-transform: uppercase; letter-spacing: .07em; } .insight strong { display: block; margin-top: 8px; font-size: 19px; letter-spacing: -.04em; } .insight p { margin: 5px 0 0; color: var(--muted); font-size: 11px; }
+    .method { display: grid; grid-template-columns: 1.2fr 1fr 1fr; gap: 18px; } .method h3 { margin-bottom: 8px; font-size: 13px; } .method p, .method li { color: var(--muted); font-size: 11px; } .method ul { margin: 0; padding-left: 16px; } .method li { margin: 7px 0; }
+    footer { display: flex; justify-content: space-between; gap: 20px; padding: 24px 2px 0; color: var(--muted-2); font-size: 11px; } footer strong { color: var(--muted); }
+    .empty { padding: 26px; border: 1px dashed var(--line); border-radius: 14px; color: var(--muted); text-align: center; }
+    @media (max-width: 1120px) { .kpi-grid { grid-template-columns: repeat(3, 1fr); } .hero { grid-template-columns: 1fr; } .span-7, .span-5, .span-4, .span-8 { grid-column: span 6; } .method { grid-template-columns: 1fr 1fr; } }
+    @media (max-width: 720px) { .page { padding: 17px 13px 30px; } .topbar { align-items: flex-start; flex-direction: column; } .top-actions { justify-content: flex-start; } .hero { padding: 21px; } h1 { font-size: 36px; } .kpi-grid { grid-template-columns: repeat(2, 1fr); gap: 9px; } .kpi { min-height: 118px; padding: 14px; } .kpi-value { margin-top: 15px; font-size: 18px; } .dashboard-grid { display: block; } .panel { margin-bottom: 13px; padding: 16px; } .bar-row { grid-template-columns: 98px 1fr; gap: 8px; } .bar-value { grid-column: 2; min-width: auto; text-align: left; margin-top: -8px; } .insight-grid, .method { grid-template-columns: 1fr; } footer { display: block; } footer span { display: block; margin-top: 6px; } }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header class="topbar">
+      <div class="brand"><div class="brand-mark">CMO</div><div><strong>CMO Financeiro</strong><small>Visão executiva pública · Omie</small></div></div>
+      <div class="top-actions"><span class="pill ok"><i class="dot"></i> Somente leitura</span><span class="pill">Snapshot agregado</span><span class="pill" id="sourceDate">—</span></div>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div class="hero-copy">
+          <div class="eyebrow">Controle financeiro · CMO</div>
+          <h1>Uma leitura clara da saúde financeira.</h1>
+          <p>Comparativo executivo entre CMO Automação e CMO Manutenção Elétrica, com dados extraídos do Omie e publicados apenas em nível agregado.</p>
+          <div class="hero-note"><i class="dot"></i><span><strong>Privacidade por desenho:</strong> clientes, IDs, observações e títulos individuais não fazem parte desta publicação.</span></div>
+        </div>
+        <div class="hero-score">
+          <div><div class="score-label">Valor no snapshot</div><div class="score-value" id="heroValue">—</div><div class="score-sub">Valor exibido dos títulos no recorte completo</div></div>
+          <div class="score-footer"><div><span>Títulos</span><strong id="heroCount">—</strong></div><div><span>Saldo pendente</span><strong id="heroPending">—</strong></div><div><span>Fonte</span><strong id="heroSource">—</strong></div></div>
+        </div>
+      </section>
+
+      <section class="kpi-grid" aria-label="Indicadores executivos">
+        <article class="kpi mint"><div class="kpi-label">Liquidados</div><div class="kpi-value" id="kpiSettled">—</div><div class="kpi-sub">Pago + recebido</div></article>
+        <article class="kpi gold"><div class="kpi-label">Saldo pendente</div><div class="kpi-value" id="kpiPending">—</div><div class="kpi-sub">Não liquidado</div></article>
+        <article class="kpi rose"><div class="kpi-label">Vencido</div><div class="kpi-value" id="kpiOverdue">—</div><div class="kpi-sub">Exposição em atraso</div></article>
+        <article class="kpi gold"><div class="kpi-label">A vencer</div><div class="kpi-value" id="kpiDue">—</div><div class="kpi-sub">Inclui vencimento hoje</div></article>
+        <article class="kpi violet"><div class="kpi-label">Pendências</div><div class="kpi-value" id="kpiPendingShare">—</div><div class="kpi-sub" id="kpiPendingSub">—</div></article>
+      </section>
+
+      <section class="dashboard-grid">
+        <article class="panel span-7"><div class="panel-head"><div><h2>Exposição por empresa</h2><p>Valor exibido e saldo pendente no snapshot</p></div><span class="panel-tag">Entidades</span></div><div id="companyList" class="company-list"></div></article>
+        <article class="panel span-5"><div class="panel-head"><div><h2>Composição por situação</h2><p>Distribuição financeira do recorte completo</p></div><span class="panel-tag">Status</span></div><div id="statusBars" class="bars"></div></article>
+        <article class="panel span-5"><div class="panel-head"><div><h2>Pagar × receber</h2><p>Naturezas preservadas, sem compensação</p></div><span class="panel-tag">Natureza</span></div><div id="natureBars" class="bars"></div></article>
+        <article class="panel span-7"><div class="panel-head"><div><h2>Leitura de gestão</h2><p>Indicadores derivados do mesmo snapshot</p></div><span class="panel-tag">Resumo</span></div><div class="insight-grid"><div class="insight"><span>Participação pendente</span><strong id="insightPending">—</strong><p>Saldo pendente sobre o valor exibido.</p></div><div class="insight"><span>Empresa maior</span><strong id="insightCompany">—</strong><p id="insightCompanySub">—</p></div><div class="insight"><span>Maior status</span><strong id="insightStatus">—</strong><p id="insightStatusSub">—</p></div></div></article>
+        <article class="panel span-12"><div class="panel-head"><div><h2>Metodologia e transparência</h2><p>Como interpretar este painel público</p></div><span class="panel-tag">Auditoria</span></div><div class="method"><div><h3>Fonte e escopo</h3><p>Snapshot real retornado pela API Omie em modo somente leitura. Esta versão publica apenas agregações por empresa, natureza e situação; o detalhe operacional permanece no dashboard local protegido.</p></div><div><h3>Fórmulas</h3><ul><li><strong>Valor exibido:</strong> valor liquidado para títulos encerrados; valor do documento para os demais.</li><li><strong>Saldo pendente:</strong> máximo entre valor do documento menos valor pago e zero.</li><li><strong>A vencer:</strong> a vencer + vence hoje.</li></ul></div><div><h3>Reconciliação</h3><ul><li>Registros no snapshot: <strong id="auditRows">—</strong>.</li><li>Registros detalhados publicados: <strong>0</strong>.</li><li>Extraído em: <strong id="auditDate">—</strong>.</li></ul></div></div></article>
+      </section>
+    </main>
+    <footer><span>CMO Financeiro · <strong>publicação agregada</strong></span><span>Dados derivados de um snapshot Omie; não representa atualização automática em tempo real.</span></footer>
+  </div>
+
+  <script id="report-data" type="application/json">{"fonte":"Omie","somente_leitura":true,"extraido_em":"2026-09-15T13:04:51.208120+00:00","gerado_em":"2026-09-15T13:04:51.687918+00:00","total":3237,"kpis":{"valor_exibido":15430525.38,"liquidado":10787159.31,"saldo_pendente":3358419.84,"vencido":817859.64,"a_vencer":2540560.2,"pendentes":3358419.84},"companies":[{"id":"cmo_automacao","label":"CMO Automação","quantidade":2515,"valor":11538418.2,"liquidado":7937014.67,"saldo_pendente":2656462.27,"vencido":675581.63,"a_vencer":1980880.64},{"id":"cmo_manutencao_eletrica","label":"CMO Manutenção Elétrica","quantidade":722,"valor":3892107.18,"liquidado":2850144.64,"saldo_pendente":701957.57,"vencido":142278.01,"a_vencer":559679.56}],"natures":[{"id":"pagar","label":"Contas a pagar","quantidade":2998,"valor":8339166.06,"liquidado":4960973.48,"saldo_pendente":2983428.29},{"id":"receber","label":"Contas a receber","quantidade":239,"valor":7091359.32,"liquidado":5826185.83,"saldo_pendente":374991.55}],"statuses":[{"id":"pago","label":"Pago","quantidade":1533,"valor":4960973.48,"liquidado":4960973.48,"saldo_pendente":0.0},{"id":"recebido","label":"Recebido","quantidade":196,"valor":5826185.83,"liquidado":5826185.83,"saldo_pendente":0.0},{"id":"a_vencer","label":"A vencer","quantidade":812,"valor":2517000.22,"liquidado":0.0,"saldo_pendente":2517000.22},{"id":"vence_hoje","label":"Vence hoje","quantidade":5,"valor":23559.98,"liquidado":0.0,"saldo_pendente":23559.98},{"id":"vencido","label":"Vencido","quantidade":204,"valor":817859.64,"liquidado":0.0,"saldo_pendente":817859.64},{"id":"cancelado","label":"Cancelado","quantidade":487,"valor":1284946.23,"liquidado":0.0,"saldo_pendente":0.0}],"reconciliation":{"api_total":3237,"payload_rows":3237,"public_detail_rows":0,"public_scope":"Agregado por empresa, natureza e situação; sem dados identificáveis."}}</script>
+  <script>
+    "use strict";
+    const DATA = JSON.parse(document.getElementById("report-data").textContent);
+    const money = (value) => (Number(value) || 0).toLocaleString("pt-BR", { style: "currency", currency: "BRL", maximumFractionDigits: 0 });
+    const count = (value) => (Number(value) || 0).toLocaleString("pt-BR");
+    const date = (value) => value ? new Date(value).toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "short" }) : "—";
+    const pct = (value, total) => total ? `${(value / total * 100).toLocaleString("pt-BR", { maximumFractionDigits: 1 })}%` : "0%";
+    const esc = (value) => String(value ?? "").replace(/[&<>"']/g, (c) => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+    const statusClass = { pago: "mint", recebido: "mint", a_vencer: "gold", vence_hoje: "gold", vencido: "rose", parcial: "gold", em_aberto: "", cancelado: "violet", indefinido: "violet" };
+    function barMarkup(entries, total, color = "") {
+      if (!entries.length) return '<div class="empty">Nenhum dado disponível.</div>';
+      const max = Math.max(...entries.map((entry) => entry.valor), 1);
+      return entries.map((entry) => `<div class="bar-row"><span class="bar-label" title="${esc(entry.label)}">${esc(entry.label)}</span><span class="bar-track"><span class="bar-fill ${color || statusClass[entry.id] || ""}" style="width:${Math.max(1, entry.valor / max * 100)}%"></span></span><strong class="bar-value">${money(entry.valor)} <small>· ${pct(entry.valor, total)}</small></strong></div>`).join("");
+    }
+    function render() {
+      const k = DATA.kpis; const total = k.valor_exibido; const pendingShare = total ? k.saldo_pendente / total : 0;
+      document.getElementById("sourceDate").textContent = `Extraído ${date(DATA.extraido_em)}`;
+      document.getElementById("heroValue").textContent = money(total); document.getElementById("heroCount").textContent = count(DATA.total); document.getElementById("heroPending").textContent = money(k.saldo_pendente); document.getElementById("heroSource").textContent = DATA.fonte;
+      document.getElementById("kpiSettled").textContent = money(k.liquidado); document.getElementById("kpiPending").textContent = money(k.saldo_pendente); document.getElementById("kpiOverdue").textContent = money(k.vencido); document.getElementById("kpiDue").textContent = money(k.a_vencer); document.getElementById("kpiPendingShare").textContent = `${(pendingShare * 100).toLocaleString("pt-BR", { maximumFractionDigits: 1 })}%`; document.getElementById("kpiPendingSub").textContent = `${money(k.saldo_pendente)} de exposição pendente`;
+      const companyTotal = DATA.companies.reduce((sum, item) => sum + item.valor, 0);
+      document.getElementById("companyList").innerHTML = DATA.companies.map((item) => `<div class="company-card"><div class="company-top"><span class="company-name">${esc(item.label)}</span><span class="company-count">${count(item.quantidade)} títulos · ${pct(item.valor, companyTotal)}</span></div><div class="bar-track"><span class="bar-fill mint" style="width:${Math.max(1, item.valor / Math.max(companyTotal, 1) * 100)}%"></span></div><div class="company-metric"><span>Valor exibido</span><strong>${money(item.valor)}</strong></div><div class="company-metric"><span>Saldo pendente</span><strong>${money(item.saldo_pendente)}</strong></div></div>`).join("");
+      document.getElementById("statusBars").innerHTML = barMarkup(DATA.statuses, total); document.getElementById("natureBars").innerHTML = barMarkup(DATA.natures, total, "violet");
+      const mainCompany = DATA.companies[0]; const mainStatus = DATA.statuses[0]; document.getElementById("insightPending").textContent = `${(pendingShare * 100).toLocaleString("pt-BR", { maximumFractionDigits: 1 })}%`; document.getElementById("insightCompany").textContent = mainCompany ? esc(mainCompany.label).replace("CMO ", "") : "—"; document.getElementById("insightCompanySub").textContent = mainCompany ? `${money(mainCompany.valor)} · ${count(mainCompany.quantidade)} títulos` : "—"; document.getElementById("insightStatus").textContent = mainStatus ? esc(mainStatus.label) : "—"; document.getElementById("insightStatusSub").textContent = mainStatus ? `${money(mainStatus.valor)} · ${count(mainStatus.quantidade)} títulos` : "—";
+      document.getElementById("auditRows").textContent = count(DATA.reconciliation.payload_rows); document.getElementById("auditDate").textContent = date(DATA.extraido_em);
+    }
+    render();
+  </script>
+</body>
+</html>
